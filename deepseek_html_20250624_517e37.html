@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Космический Кликер</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        header {
+            padding: 15px 0;
+            border-bottom: 2px solid #0f3460;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            background: linear-gradient(90deg, #4cc9f0, #f72585);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            color: #b8b8d1;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+        
+        .click-area {
+            background: rgba(15, 52, 96, 0.6);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid #4cc9f0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .click-area:active {
+            transform: scale(0.97);
+            background: rgba(15, 52, 96, 0.8);
+        }
+        
+        .click-area::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(76, 201, 240, 0.4) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        
+        .click-area:active::before {
+            opacity: 1;
+        }
+        
+        .click-icon {
+            font-size: 8rem;
+            color: #4cc9f0;
+            margin: 20px 0;
+            text-shadow: 0 0 20px rgba(76, 201, 240, 0.7);
+            transition: transform 0.1s;
+        }
+        
+        .click-area:active .click-icon {
+            transform: scale(0.9);
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+        
+        .stat-box {
+            background: rgba(31, 40, 51, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            min-width: 160px;
+            margin: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border: 1px solid #4cc9f0;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #f72585;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: #b8b8d1;
+            font-size: 1.1rem;
+        }
+        
+        .upgrades {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .upgrade {
+            background: rgba(31, 40, 51, 0.7);
+            border-radius: 15px;
+            padding: 15px;
+            width: 180px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid #4cc9f0;
+        }
+        
+        .upgrade:hover {
+            transform: translateY(-5px);
+            background: rgba(31, 40, 51, 0.9);
+            box-shadow: 0 5px 15px rgba(76, 201, 240, 0.4);
+        }
+        
+        .upgrade i {
+            font-size: 2.5rem;
+            color: #4cc9f0;
+            margin-bottom: 10px;
+        }
+        
+        .upgrade h3 {
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        
+        .upgrade p {
+            color: #b8b8d1;
+            font-size: 0.9rem;
+        }
+        
+        .upgrade-cost {
+            color: #f72585;
+            font-weight: bold;
+            margin-top: 8px;
+            font-size: 1.2rem;
+        }
+        
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(76, 201, 240, 0.6);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        footer {
+            margin-top: auto;
+            padding: 20px;
+            text-align: center;
+            color: #b8b8d1;
+            font-size: 0.9rem;
+            border-top: 1px solid #0f3460;
+        }
+        
+        .pulse {
+            animation: pulse 0.5s ease-out;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            .click-icon { font-size: 6rem; }
+            .stat-box { min-width: 120px; padding: 15px; }
+            .stat-value { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <header>
+            <h1>КОСМИЧЕСКИЙ КЛИКЕР</h1>
+            <p class="subtitle">Кликни, чтобы собрать звездную энергию!</p>
+        </header>
+        
+        <div class="click-area" id="clickArea">
+            <i class="fas fa-rocket click-icon" id="clickIcon"></i>
+            <h2>КЛИКАЙ СЮДА!</h2>
+            <p>Каждый клик приносит космическую энергию</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-label">Энергия</div>
+                <div class="stat-value" id="score">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Энергия/клик</div>
+                <div class="stat-value" id="perClick">1</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Авто-сбор</div>
+                <div class="stat-value" id="autoPerSec">0</div>
+            </div>
+        </div>
+        
+        <div class="upgrades">
+            <div class="upgrade" id="upgrade1">
+                <i class="fas fa-bolt"></i>
+                <h3>Усилитель энергии</h3>
+                <p>+2 энергии за клик</p>
+                <div class="upgrade-cost">Стоимость: 50</div>
+            </div>
+            <div class="upgrade" id="upgrade2">
+                <i class="fas fa-robot"></i>
+                <h3>Авто-кликер</h3>
+                <p>1 энергия/сек</p>
+                <div class="upgrade-cost">Стоимость: 100</div>
+            </div>
+            <div class="upgrade" id="upgrade3">
+                <i class="fas fa-satellite"></i>
+                <h3>Квантовый сборщик</h3>
+                <p>+5 энергии/клик</p>
+                <div class="upgrade-cost">Стоимость: 500</div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        © 2025 Космический Кликер | Собери максимальную энергию!
+    </footer>
+
+    <script>
+        // Игровые переменные
+        let score = 0;
+        let perClick = 1;
+        let autoPerSec = 0;
+        let upgrades = {
+            upgrade1: { cost: 50, boost: 2, bought: false },
+            upgrade2: { cost: 100, boost: 1, bought: false },
+            upgrade3: { cost: 500, boost: 5, bought: false }
+        };
+        
+        // Элементы DOM
+        const scoreElement = document.getElementById('score');
+        const perClickElement = document.getElementById('perClick');
+        const autoPerSecElement = document.getElementById('autoPerSec');
+        const clickArea = document.getElementById('clickArea');
+        const clickIcon = document.getElementById('clickIcon');
+        const particlesContainer = document.getElementById('particles');
+        
+        // Инициализация
+        updateUI();
+        
+        // Обработчик клика
+        clickArea.addEventListener('click', () => {
+            score += perClick;
+            updateUI();
+            createParticles(15);
+            clickIcon.classList.add('pulse');
+            setTimeout(() => clickIcon.classList.remove('pulse'), 500);
+        });
+        
+        // Обработчики улучшений
+        document.getElementById('upgrade1').addEventListener('click', () => buyUpgrade('upgrade1'));
+        document.getElementById('upgrade2').addEventListener('click', () => buyUpgrade('upgrade2'));
+        document.getElementById('upgrade3').addEventListener('click', () => buyUpgrade('upgrade3'));
+        
+        // Автоматический доход
+        setInterval(() => {
+            if (autoPerSec > 0) {
+                score += autoPerSec;
+                updateUI();
+                createParticles(5);
+            }
+        }, 1000);
+        
+        // Функция покупки улучшения
+        function buyUpgrade(upgradeId) {
+            const upgrade = upgrades[upgradeId];
+            if (!upgrade.bought && score >= upgrade.cost) {
+                score -= upgrade.cost;
+                upgrade.bought = true;
+                
+                if (upgradeId === 'upgrade1' || upgradeId === 'upgrade3') {
+                    perClick += upgrade.boost;
+                } else if (upgradeId === 'upgrade2') {
+                    autoPerSec += upgrade.boost;
+                }
+                
+                // Визуальное оформление купленного улучшения
+                const upgradeElement = document.getElementById(upgradeId);
+                upgradeElement.style.background = 'rgba(76, 201, 240, 0.2)';
+                upgradeElement.style.border = '2px solid #f72585';
+                
+                updateUI();
+                createParticles(30);
+            }
+        }
+        
+        // Обновление интерфейса
+        function updateUI() {
+            scoreElement.textContent = Math.floor(score);
+            perClickElement.textContent = perClick;
+            autoPerSecElement.textContent = autoPerSec;
+        }
+        
+        // Создание частиц для анимации
+        function createParticles(count) {
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Случайные свойства частиц
+                const size = Math.random() * 10 + 5;
+                const posX = Math.random() * window.innerWidth;
+                const posY = Math.random() * window.innerHeight;
+                
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${posX}px`;
+                particle.style.top = `${posY}px`;
+                particle.style.background = `rgba(${Math.random() > 0.5 ? 247 : 76}, ${Math.random() > 0.5 ? 37 : 201}, ${Math.random() > 0.5 ? 133 : 240}, ${Math.random() * 0.5 + 0.3})`;
+                
+                particlesContainer.appendChild(particle);
+                
+                // Анимация и удаление частиц
+                setTimeout(() => {
+                    particle.style.transition = 'transform 1s, opacity 1s';
+                    particle.style.transform = `translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px) scale(0.1)`;
+                    particle.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        particle.remove();
+                    }, 1000);
+                }, 100);
+            }
+        }
+        
+        // Фоновая анимация частиц
+        setInterval(() => createParticles(1), 500);
+    </script>
+</body>
+</html>
